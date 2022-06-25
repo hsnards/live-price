@@ -22,20 +22,20 @@ const Card = ({
         } else {
             return quote.toLocaleString("en-US")
         }
-    },[percent,quote])
+    },[percent,toman])
     const buyValue = useCallback((price) => {
         if (toman) {
             return (price * buy).toLocaleString("fa-IR")
         } else {
             return price.toLocaleString("en-US")
         }
-    },[price])
+    },[price,toman])
     const customChartData = useCallback((chart, name) => {
         let customData = chart?.map((itm) => {
             return {uv: itm, name: name}
         })
         return [...customData]
-    },[chart,name])
+    },[name,toman])
     return (
         <Box className={cardContainer}>
             <Box className={tableRow} sx={{ textAlign: "end", display: "flex" }} alignItems={"center"}>
