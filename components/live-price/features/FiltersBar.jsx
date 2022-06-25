@@ -1,7 +1,7 @@
-import React, {useEffect , useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Grid, MenuItem, TextField, ToggleButton, ToggleButtonGroup} from "@mui/material";
 import {useRouter} from "next/router";
-import {ArrowDropDown, ArrowDropDownSharp, Close} from "@mui/icons-material";
+import {ArrowDropDown, ArrowDropDownSharp, Close, Search, StarOutline} from "@mui/icons-material";
 import useDebounce from "../../utils/useDebounce";
 
 const FiltersBar = ({toman, setToman}) => {
@@ -21,48 +21,67 @@ const FiltersBar = ({toman, setToman}) => {
           ...cloneQuery,
           page: 1
         },
-      }
+      },
+    "/",{
+      scroll:false
+    }
     );
   };
   useEffect(() => {
-if(debouncedSearchTerm){
-  let cloneQuery = {...router.query , q:debouncedSearchTerm}
-  router.push(
-    {
-      pathname: router.pathname,
-      query: {
-        ...cloneQuery,
-        page: 1
-      },
-    },
-    "/",
-    {
-      scroll: false,
+    if (debouncedSearchTerm) {
+      let cloneQuery = {...router.query, q: debouncedSearchTerm}
+      router.push(
+        {
+          pathname: router.pathname,
+          query: {
+            ...cloneQuery,
+            page: 1
+          },
+        },
+        "/",
+        {
+          scroll: false,
+        }
+      );
+    } else {
+      let cloneQuery = {...router.query}
+      delete cloneQuery.q
+      router.push(
+        {
+          pathname: router.pathname,
+          query: {
+            ...cloneQuery,
+            page: 1
+          },
+        },
+        "/",
+        {
+          scroll: false,
+        }
+      );
     }
-  );
-}
-else{
-  let cloneQuery = {...router.query }
-  delete cloneQuery.q
-  router.push(
-    {
-      pathname: router.pathname,
-      query: {
-        ...cloneQuery,
-        page: 1
-      },
-    },
-    "/",
-    {
-      scroll: false,
-    }
-  );
-}
   }, [debouncedSearchTerm])
   const handleAlignment = (event, newAlignment) => {
     setAlignment(newAlignment);
     setToman(!toman)
   };
+  const handleDeleteSort = () => {
+    setCurrency("")
+    let cloneQuery = {...router.query}
+    delete cloneQuery.sort
+    router.push(
+      {
+        pathname: router.pathname,
+        query: {
+          ...cloneQuery,
+          page: 1
+        },
+      },
+      "/",
+      {
+        scroll: false,
+      })
+  }
   const input = {
     "& .MuiOutlinedInput-root": {
       borderRadius: 2,
@@ -82,42 +101,28 @@ else{
   return (
     <Grid container columnSpacing={5} mb={6}>
       <Grid item xs={4} paddingTop={6}>
-        <TextField value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} sx={input} fullWidth
+        <TextField InputProps={{
+          startAdornment: <Search style={{transform: "scaleX(-1)", marginRight: "10px", color: "#8B9098"}} />,
+        }} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} sx={input} fullWidth
                    placeholder={"جستجو"}/>
       </Grid>
       <Grid item xs={4} paddingTop={6} pr={3}>
-        <Button color={"black"} variant={"outlined"} sx={{width: "50%", height: "48.5px", borderRadius: 2}}>
+        <Button color={"black"} variant={"outlined"}  sx={{width: "50%", height: "48.5px", borderRadius: 2 ,border:"1px solid #e9e9e9", "& .MuiButtonBase-root":{ border:"1px solid #e9e9e9" }}}>
+          <StarOutline sx={{ml:2}}/>
           نشان شده ها
         </Button>
         <TextField
           label={"ترتیب بر اساس"}
           id="outlined-select-currency"
           select
-          sx={{...input, width: "50%", pr: 3, "& .MuiSelect-select::placeholder": {ml: 2}}}
+          sx={{...input, width: "50%", pr: 3}}
           value={currency}
           onChange={handleChange}
           dir={"rtl"}
           SelectProps={{
-            IconComponent: () => currency ? <Close onClick={() => {
-                setCurrency("")
-                let cloneQuery = {...router.query}
-                delete cloneQuery.sort
-                router.push(
-                  {
-                    pathname: router.pathname,
-                    query: {
-                      ...cloneQuery,
-                      page: 1
-                    },
-                  },
-                  "/",
-                  {
-                    scroll: false,
-                  })
-              }} sx={{cursor: "pointer", ml: 1, color: "black.light"}}/> :
+            IconComponent: () => currency ? <Close onClick={handleDeleteSort} sx={{cursor: "pointer", ml: 1, color: "black.light"}}/> :
               <ArrowDropDown sx={{mr: 1, color: "black.light"}}/>,
           }}
-
         >
           {currencies.map((option) => (
             <MenuItem key={option.value} value={option.value}>
@@ -125,7 +130,6 @@ else{
 
             </MenuItem>
           ))}
-
         </TextField>
       </Grid>
       <Grid item xs={4} paddingTop={6} paddingRight={6}>
