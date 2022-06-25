@@ -22,16 +22,13 @@ export async function getServerSideProps(context) {
         url1.search = searchParams.toString();
 
     let data;
-  console.log(url1.href)
+
     try {
         data = await fetch(url1.href);
         data = await data.json();
     } catch (err) {
         data = [];
     }
-
-    // let response = await fetch("https://api.bitbarg.com/api/v1/currencies?page=1")
-    // let data = await response.json();
 
     return {
         props: { data },
